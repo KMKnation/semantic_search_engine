@@ -1,4 +1,5 @@
 const API_SERVER = window.location.origin;
+var searchResultElem;
 
 function callAPI(path, method, data, callback) {
     var xhr = new XMLHttpRequest();
@@ -31,12 +32,15 @@ function customChangeEvent(bar) {
 
 function sendQuery(query){
 
+    searchResultElem.style.display = "none";
+
     var data = {
         "query" : query
     };
 
     getInvites(function (result) {
         console.log(result);
+        searchResultElem.style.display = "block";
 
         var container = document.getElementById('invite-records');
         container.innerHTML = "";
@@ -80,6 +84,7 @@ function sendQuery(query){
 function pageReady(request, response) {
 
     var searchBar = document.getElementById("search-email");
+    searchResultElem = document.getElementById("invite-records");
     setInterval(() => {
         customChangeEvent(searchBar);
     }, 100);
