@@ -73,7 +73,6 @@ def get_data(manager):
         line = row['training_content']
         line = line.replace(r'\r', "")
         line = line.replace(r'\n', " ")
-        line = line.replace(r'b', "")
         line = line.replace('\\xe2\\x80\\x99', "'")
         line = line.rstrip()
         line = line.lstrip()

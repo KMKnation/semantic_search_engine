@@ -24,7 +24,7 @@
       display: block;
     }
 
-    #container #search-videos {
+    #container #search-email {
       width: 80%;
       padding: 1%;
       border-radius: 5px;
@@ -49,6 +49,26 @@
       background-color: aquamarine;
     }
 
+    #card-invite #tooltiptext {
+      visibility: hidden;
+      width: 60%;
+      background-color: black;
+      border-radius: 1em;
+      margin: 0.5%;
+      color: #fff;
+      font-family: sans-serif;
+      text-align: justify;
+      padding: 1em;
+
+      /* Position the tooltip */
+      position: absolute;
+      z-index: 1;
+    }
+
+    #card-invite:hover #tooltiptext {
+      visibility: visible;
+    }
+
     #card-invite #card-invite-detail {
       text-align: start;
       color: #424242;
@@ -67,13 +87,12 @@
 
   <div id="header">
     <!--<img src="https://now.tethrit.com/public/upload/settings_files/logo-20191118095910994070.png" style="margin:auto;  display:block; padding:2%"></img>-->
-    <img src="images/logo.png"
-         style="margin:auto;  display:block; padding:2%"/>
+    <img src="images/logo.png" style="margin:auto;  display:block; padding:2%" />
   </div>
 
   <div id="container">
 
-    <input type="text" id="search-videos" placeholder="Search"></input>
+    <input type="text" id="search-email" placeholder="Search"></input>
 
     <div id="invite-records">
 

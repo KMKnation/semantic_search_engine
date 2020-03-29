@@ -17,7 +17,7 @@ class DB:
     '''
 
     def __init__(self, databsae_path):
-        self.engine = create_engine('sqlite:///'+databsae_path)
+        self.engine = create_engine('sqlite:///' + databsae_path)
         # self.engine = create_engine('sqlite:///db/db.sqlite')
 
     def get_table_names(self):
@@ -31,16 +31,16 @@ class DB:
         con.execute(query)
         con.close()
 
-    def get_emails(self):
-        # Open engine in context manager
-        # Perform query and save results to DataFrame: df
-        with self.engine.connect() as con:
-            rs = con.execute("SELECT * FROM emails")
-            # df = pd.DataFrame(rs.fetchmany(3))
-            df = pd.DataFrame(rs.fetchall())
-            df.columns = rs.keys()
-
-        return df
+    # def get_emails(self):
+    #     # Open engine in context manager
+    #     # Perform query and save results to DataFrame: df
+    #     with self.engine.connect() as con:
+    #         rs = con.execute("SELECT * FROM emails")
+    #         # df = pd.DataFrame(rs.fetchmany(3))
+    #         df = pd.DataFrame(rs.fetchall())
+    #         df.columns = rs.keys()
+    #
+    #     return df
 
     def get_data(self, query):
         # Execute query and store records in DataFrame: df
@@ -67,11 +67,8 @@ class DB:
         rs = self.execute_query(inset_query)
         return rs
 
-    def get_emails(self, id=None):
-        if id == None:
-            return self.get_data('SELECT * FROM emails')
-        else:
-            return self.get_data('SELECT * FROM emails WHERE email_id=' + str(id))
+    def get_emails(self, group=None):
+        return self.get_data('SELECT * FROM emails WHERE cluster=' + str(group))
 
 # data = {
 #     'room_token':'213123ccsd',

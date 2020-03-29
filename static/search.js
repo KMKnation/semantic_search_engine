@@ -13,36 +13,60 @@ function callAPI(path, method, data, callback) {
     xhr.open(method, path);
     xhr.setRequestHeader("content-type", "application/json");
     xhr.setRequestHeader("cache-control", "no-cache");
-
+    console.log(data);
     xhr.send(data);
 
 }
 
 
-function pageReady(request, response) {
+var lastQuery = "";
+function customChangeEvent(bar) {
+    var newQuery = bar.value;
+    if (newQuery !== lastQuery) {
+        console.log("CHANGE");
+        lastQuery = newQuery;
+        sendQuery(newQuery);
+    }
+}
+
+function sendQuery(query){
+
+    var data = {
+        "query" : query
+    };
+
     getInvites(function (result) {
         console.log(result);
 
         var container = document.getElementById('invite-records');
+        container.innerHTML = "";
+
+
         if (result.data.length > 0) {
             result.data.forEach(function (item) {
-                console.log('contact_info: ' + item.contact_info);
+                // console.log('contact_info: ' + item.subject);
 
                 var cardInvite = document.createElement('div');
                 cardInvite.id = "card-invite";
                 cardInvite.style.backgroundColor = 'aquamarine'
 
-                if (item.isconnected === 0) {
-                    cardInvite.style.backgroundColor = '#e0e0e0'
-                }
+                cardInvite.style.backgroundColor = '#00aee'
+
                 var content = document.createElement('p');
                 content.id = 'card-invite-detail'
-                content.textContent = item.contact_info;
-                cardInvite.onclick = function () {
-                    window.location.href = API_SERVER + "/invite/" + item.id;
-                };
+                content.textContent = item.subject;
+
+                var toolTip = document.createElement('span');
+                toolTip.id = "tooltiptext";
+                toolTip.innerHTML = item.content;
+
+                
+                // cardInvite.onclick = function () {
+                //     // window.location.href = API_SERVER + "/invite/" + item.id;
+                // };
 
                 cardInvite.appendChild(content);
+                cardInvite.appendChild(toolTip);
                 container.appendChild(cardInvite);
             });
         } else {
@@ -50,11 +74,19 @@ function pageReady(request, response) {
             noP.textContent = 'No Data Found !!'
             container.appendChild(noP);
         }
-    })
+    }, JSON.stringify(data));
 }
 
-function getInvites(callback) {
-    callAPI(API_SERVER + "/get_invites", "GET", undefined, function (response) {
+function pageReady(request, response) {
+
+    var searchBar = document.getElementById("search-email");
+    setInterval(() => {
+        customChangeEvent(searchBar);
+    }, 100);
+}
+
+function getInvites(callback, data) {
+    callAPI(API_SERVER + "/get_relevant", "POST", data, function (response) {
         callback(response);
     });
 }

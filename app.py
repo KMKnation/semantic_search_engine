@@ -5,6 +5,7 @@ import db_manager
 import json
 from db_manager import DB
 import config
+
 current_dir = os.curdir
 # create the application object
 app = Flask(__name__)
@@ -14,6 +15,7 @@ global manager
 data_dir = os.path.join(os.curdir, 'db')
 if not os.path.exists(data_dir):
     os.mkdir(data_dir)
+
 
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db/test.db'
 
@@ -29,79 +31,48 @@ def home():
     return render_template('search.html')
 
 
-@app.route('/home')
-def caller():
-    return render_template('index.html')
-
-
-@app.route('/invite/<id>')
-def invite_report(id):
-    resultDf = manager.get_videos(id)
-    data = []
-    for index, row in resultDf.iterrows():
-        data.append(dict(row))
-
-    if len(data) > 0:
-        return render_template('detail.html', data=json.dumps(data))
-    else:
-        return render_template('no_data_found.html')
-
-
 '''
 API DEVELOPMENT
 '''
+import re
+import string
+import nltk
 
+stopword = nltk.corpus.stopwords.words('english')
 
-@app.route('/invite', methods=['POST'])
-def invite():
-    result = manager.insert_invite(request.json)
-    if (result.rowcount > 0):
-        return make_response(json.dumps({'success': 1, 'invite_id': result.lastrowid - 1}), 200)
-    else:
-        return make_response(json.dumps({'success': 0}), 200)
+def clean_text(text):
+    text_nopunct = "".join([char for char in text if char not in string.punctuation])
+    tokens = re.split('\W+', text_nopunct)
+    text = [word for word in tokens if word not in stopword]
+    return text
 
+from inference import infer
 
-@app.route('/record', methods=['POST'])
-def record():
-    result = manager.insert_video(request.json)
-    if (result.rowcount > 0):
-        return make_response(json.dumps({'success': 1, 'video_id': result.lastrowid - 1}), 200)
-    else:
-        return make_response(json.dumps({'success': 0}), 200)
-
-
-@app.route('/get_invites', methods=['GET'])
+@app.route('/get_relevant', methods=['POST'])
 def get_invite():
+    result = {"error": 1}
     try:
-        id = request.args['id']
-        resultDf = manager.get_invitations(id)
+
+        query = json.loads(request.data.decode('utf-8'))['query']
+        group = infer(query)
+
+        resultDf = manager.get_emails(group[0])
+
+        data = []
+        for index, row in resultDf.iterrows():
+            data.append(dict(row))
+
+        result['data'] = data
+        result["error"] = 0
+
+        return make_response(json.dumps(result), 200)
     except Exception as err:
-        resultDf = manager.get_invitations()
-
-    data = []
-    for index, rows in resultDf.iterrows():
-        print(rows)
-        data.append({
-            'id': rows['invite_id'],
-            'room_token': rows['room_token'],
-            'contact_info': rows['contact_info'],
-            'isconnected': rows['isconnected']
-        })
-
-    result = {
-        'data': data
-    }
-    if len(data) > 0:
-        result['success'] = 1
-    else:
-        result['success'] = 0
-
-    return make_response(json.dumps(result), 200)
+        return make_response(json.dumps(result), 404)
 
 
 # start the server with the 'run()' method
 if __name__ == '__main__':
-    manager = DB(app.config['DATABASE_PATH'] )
+    manager = DB(app.config['DATABASE_PATH'])
 
     if not os.path.exists(app.config['DATABASE_PATH']):
         manager.create_table(db_manager.CREATE_TABLE_STATEMENT)
