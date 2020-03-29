@@ -3,9 +3,9 @@ import pandas as pd
 
 CREATE_TABLE_STATEMENT = 'CREATE TABLE emails(' \
                          'email_id   INT  NOT NULL,' \
-                         'subject VARCHAR (50)      NOT NULL,' \
-                         'content  VARCHAR (400)   NOT NULL,' \
-                         'training_content  VARCHAR (300)   NOT NULL,' \
+                         'subject VARCHAR (100) NOT NULL,' \
+                         'content  TEXT  NOT NULL,' \
+                         'training_content  TEXT  NOT NULL,' \
                          'cluster  INT,' \
                          'PRIMARY KEY (email_id));'
 
@@ -16,8 +16,9 @@ class DB:
     and any loaded models.
     '''
 
-    def __init__(self):
-        self.engine = create_engine('sqlite:///db/db.sqlite')
+    def __init__(self, databsae_path):
+        self.engine = create_engine('sqlite:///'+databsae_path)
+        # self.engine = create_engine('sqlite:///db/db.sqlite')
 
     def get_table_names(self):
         # Save the table names to a list: table_names
@@ -59,26 +60,14 @@ class DB:
         return rs
 
     def insert_email(self, data):
-        if not 'email_id' in data.keys():
-            resultDf = self.get_data('SELECT * FROM emails')
-            inset_query = "INSERT INTO emails " \
-                          "VALUES ('" + str(len(resultDf)) + "', '" + data['subject'] + "', '" + data[
-                              'content'] + "', '" + data['training_content'] + "', '0');"
-            print(inset_query)
-            rs = self.execute_query(inset_query)
-            return rs
-        else:
-            resultDf = self.get_data('SELECT * FROM emails WHERE email_id=' + data['email_id'])
-            update_query = "UPDATE emails SET cluster = '" + data['cluster'] + "' WHERE email_id = " + data[
-                'email_id'] + ";"
-            if (len(resultDf) > 0):
-                rs = self.execute_query(update_query)
-                return rs
-            else:
-                print('NO email record FOUND!!')
-                return None
+        inset_query = "INSERT INTO emails " \
+                      "VALUES ('" + str(data['email_id']) + "', '" + data['subject'] + "', '" + data[
+                          'content'] + "', '" + data['training_content'] + "', '0');"
+        # print(inset_query)
+        rs = self.execute_query(inset_query)
+        return rs
 
-    def get_invitations(self, id=None):
+    def get_emails(self, id=None):
         if id == None:
             return self.get_data('SELECT * FROM emails')
         else:
