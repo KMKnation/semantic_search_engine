@@ -32,14 +32,6 @@ def init():
         manager.create_table(db_manager.CREATE_TABLE_STATEMENT)
         print("REQUIRED TABLES CREATED..")
 
-    stopword = nltk.corpus.stopwords.words('english')
-
-    def clean_text(text):
-        text_nopunct = "".join([char for char in text if char not in string.punctuation])
-        tokens = re.split('\W+', text_nopunct)
-        text = [word for word in tokens if word not in stopword]
-        return text
-
     kmeans = pickle.load(open("kmeans.pkl", "rb"))
     vectorizer = pickle.load(open('tfidf.pickle', "rb"))
 
@@ -90,6 +82,14 @@ def get_invite():
 
 # start the server with the 'run()' method
 if __name__ == '__main__':
+    stopword = nltk.corpus.stopwords.words('english')
+    global clean_text
+    def clean_text(text):
+        text_nopunct = "".join([char for char in text if char not in string.punctuation])
+        tokens = re.split('\W+', text_nopunct)
+        text = [word for word in tokens if word not in stopword]
+        return text
+
     init()
 
     app.run(debug=True)
