@@ -1,6 +1,6 @@
 {
   "name": "Semantic Search Engine",
-  "description": "A barebones Python app, which can easily be deployed to Heroku.",
+  "description": "An email clustering based search engine",
   "image": "heroku/python",
   "repository": "https://github.com/heroku/python-getting-started",
   "keywords": ["python", "django" ],
