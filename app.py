@@ -7,6 +7,9 @@ from db_manager import DB
 import config
 import pickle
 from inference import infer
+import re
+import string
+import nltk
 
 current_dir = os.curdir
 # create the application object
@@ -18,11 +21,24 @@ def init():
     global manager
     global kmeans
     global vectorizer
-    manager = DB(app.config['DATABASE_PATH'])
 
     data_dir = os.path.join(os.curdir, 'db')
     if not os.path.exists(data_dir):
         os.mkdir(data_dir)
+
+    manager = DB(app.config['DATABASE_PATH'])
+
+    if not os.path.exists(app.config['DATABASE_PATH']):
+        manager.create_table(db_manager.CREATE_TABLE_STATEMENT)
+        print("REQUIRED TABLES CREATED..")
+
+    stopword = nltk.corpus.stopwords.words('english')
+
+    def clean_text(text):
+        text_nopunct = "".join([char for char in text if char not in string.punctuation])
+        tokens = re.split('\W+', text_nopunct)
+        text = [word for word in tokens if word not in stopword]
+        return text
 
     kmeans = pickle.load(open("kmeans.pkl", "rb"))
     vectorizer = pickle.load(open('tfidf.pickle', "rb"))
@@ -45,18 +61,6 @@ def home():
 '''
 API DEVELOPMENT
 '''
-import re
-import string
-import nltk
-
-stopword = nltk.corpus.stopwords.words('english')
-
-
-def clean_text(text):
-    text_nopunct = "".join([char for char in text if char not in string.punctuation])
-    tokens = re.split('\W+', text_nopunct)
-    text = [word for word in tokens if word not in stopword]
-    return text
 
 
 @app.route('/get_relevant', methods=['POST'])
@@ -85,16 +89,7 @@ def get_invite():
 
 
 # start the server with the 'run()' method
-# if __name__ == '__main__':
-#     init()
-#     if not os.path.exists(app.config['DATABASE_PATH']):
-#             manager.create_table(db_manager.CREATE_TABLE_STATEMENT)
-#             print("REQUIRED TABLES CREATED..")
-#
-#     app.run(debug=True)
-init()
-if not os.path.exists(app.config['DATABASE_PATH']):
-    manager.create_table(db_manager.CREATE_TABLE_STATEMENT)
-    print("REQUIRED TABLES CREATED..")
+if __name__ == '__main__':
+    init()
 
-app.run(debug=True)
+    app.run(debug=True)
