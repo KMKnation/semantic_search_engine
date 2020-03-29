@@ -1,9 +1,8 @@
 
 def infer(text, kmeans, vectorizer):
     custom_data = [text]
-    custom_matrix = vectorizer.transform(custom_data)
+    custom_matrix=vectorizer.transform(custom_data)
     group = kmeans.predict(custom_matrix)
     return group
 
-
-# print(infer("Hey your Uber ride is on your way, Please share the OTP."))
+# print(infer("Hey your "))
