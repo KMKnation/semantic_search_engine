@@ -4,9 +4,11 @@ import pandas as pd
 CREATE_TABLE_STATEMENT = 'CREATE TABLE emails(' \
                          'email_id   INT  NOT NULL,' \
                          'subject VARCHAR (50)      NOT NULL,' \
-                         'content  VARCHAR (200)   NOT NULL,' \
+                         'content  VARCHAR (400)   NOT NULL,' \
+                         'training_content  VARCHAR (300)   NOT NULL,' \
                          'cluster  INT,' \
                          'PRIMARY KEY (email_id));'
+
 
 class DB:
     '''
@@ -51,23 +53,24 @@ class DB:
 
     def update_email(self, data):
         update_query = "UPDATE emails SET " \
-                       "cluster = '"+str(data['cluster'])+"'" \
-                       " WHERE email_id = " + str(data['id']) + ";"
+                       "cluster = '" + str(data['cluster']) + "'" \
+                                                              " WHERE email_id = " + str(data['id']) + ";"
         rs = self.execute_query(update_query)
         return rs
-
 
     def insert_email(self, data):
         if not 'email_id' in data.keys():
             resultDf = self.get_data('SELECT * FROM emails')
             inset_query = "INSERT INTO emails " \
-                          "VALUES ('" + str(len(resultDf)) + "', '" + data['subject'] + "', '" + data['content'] + "', '0');"
+                          "VALUES ('" + str(len(resultDf)) + "', '" + data['subject'] + "', '" + data[
+                              'content'] + "', '" + data['training_content'] + "', '0');"
             print(inset_query)
             rs = self.execute_query(inset_query)
             return rs
         else:
             resultDf = self.get_data('SELECT * FROM emails WHERE email_id=' + data['email_id'])
-            update_query = "UPDATE emails SET cluster = '" + data['cluster'] + "' WHERE email_id = " + data['email_id'] + ";"
+            update_query = "UPDATE emails SET cluster = '" + data['cluster'] + "' WHERE email_id = " + data[
+                'email_id'] + ";"
             if (len(resultDf) > 0):
                 rs = self.execute_query(update_query)
                 return rs
