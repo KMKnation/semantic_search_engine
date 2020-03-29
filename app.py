@@ -21,6 +21,7 @@ def init():
     global manager
     global kmeans
     global vectorizer
+    global clean_text
 
     data_dir = os.path.join(os.curdir, 'db')
     if not os.path.exists(data_dir):
@@ -58,8 +59,6 @@ API DEVELOPMENT
 @app.route('/get_relevant', methods=['POST'])
 def get_invite():
     result = {"error": 1}
-    global kmeans
-    global vectorizer
     try:
 
         query = json.loads(request.data.decode('utf-8'))['query']
@@ -82,6 +81,7 @@ def get_invite():
 
 # start the server with the 'run()' method
 if __name__ == '__main__':
+    global stopword
     stopword = nltk.corpus.stopwords.words('english')
     global clean_text
     def clean_text(text):
