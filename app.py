@@ -70,6 +70,8 @@ def clean_text(text):
 @app.route('/get_relevant', methods=['POST'])
 def get_invite():
     result = {"error": 1}
+    global kmeans
+    global vectorizer
     try:
 
         query = json.loads(request.data.decode('utf-8'))['query']
