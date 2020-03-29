@@ -5,12 +5,16 @@ import db_manager
 import json
 from db_manager import DB
 import config
+import pickle
+from inference import infer
 
 current_dir = os.curdir
 # create the application object
 app = Flask(__name__)
 app.config['DATABASE_PATH'] = os.path.join(os.curdir, 'db/db.sqlite')
 global manager
+global kmeans
+global vectorizer
 
 data_dir = os.path.join(os.curdir, 'db')
 if not os.path.exists(data_dir):
@@ -46,7 +50,6 @@ def clean_text(text):
     text = [word for word in tokens if word not in stopword]
     return text
 
-from inference import infer
 
 @app.route('/get_relevant', methods=['POST'])
 def get_invite():
@@ -54,7 +57,7 @@ def get_invite():
     try:
 
         query = json.loads(request.data.decode('utf-8'))['query']
-        group = infer(query)
+        group = infer(query, kmeans, vectorizer)
 
         resultDf = manager.get_emails(group[0])
 
@@ -73,11 +76,6 @@ def get_invite():
 # start the server with the 'run()' method
 if __name__ == '__main__':
     manager = DB(app.config['DATABASE_PATH'])
-
-    import re
-    import string
-    import nltk
-
     stopword = nltk.corpus.stopwords.words('english')
 
     def clean_text(text):
@@ -87,7 +85,12 @@ if __name__ == '__main__':
         return text
 
 
+    kmeans = pickle.load(open("kmeans.pkl", "rb"))
+    vectorizer = pickle.load(open('tfidf.pickle', "rb"))
+
+
     if not os.path.exists(app.config['DATABASE_PATH']):
-        manager.create_table(db_manager.CREATE_TABLE_STATEMENT)
-        print("REQUIRED TABLES CREATED..")
+            manager.create_table(db_manager.CREATE_TABLE_STATEMENT)
+            print("REQUIRED TABLES CREATED..")
+
     app.run(debug=True)
