@@ -74,6 +74,19 @@ def get_invite():
 if __name__ == '__main__':
     manager = DB(app.config['DATABASE_PATH'])
 
+    import re
+    import string
+    import nltk
+
+    stopword = nltk.corpus.stopwords.words('english')
+
+    def clean_text(text):
+        text_nopunct = "".join([char for char in text if char not in string.punctuation])
+        tokens = re.split('\W+', text_nopunct)
+        text = [word for word in tokens if word not in stopword]
+        return text
+
+
     if not os.path.exists(app.config['DATABASE_PATH']):
         manager.create_table(db_manager.CREATE_TABLE_STATEMENT)
         print("REQUIRED TABLES CREATED..")
