@@ -7,16 +7,8 @@ EMAIL_DATASET_PATH = os.path.join(os.getcwd(), 'emails')
 if not os.path.exists(EMAIL_DATASET_PATH):
     os.mkdir(EMAIL_DATASET_PATH)
 
-def scrap(manager):
-    mail = imaplib.IMAP4_SSL('imap.gmail.com')
-    # imaplib module implements connection based on IMAPv4 protocol
-    mail.login("asfinavayani1@gmail.com", "V@yani1995")
-    # >> ('OK', [username at gmail.com Vineet authenticated (Success)'])
 
-    mail.list() # Lists all labels in GMail
-    mail.select('inbox') # Connected to inbox.
-
-    result, data = mail.uid('search', None, "ALL")
+def search_content(mail, data, manager):
     # search and return uids instead
     i = len(data[0].split()) # data[0] is a space separate string
     for x in range(i):
@@ -60,22 +52,31 @@ def scrap(manager):
         # if x == 9000:
         # break
 
+def scrap(manager):
+    mail = imaplib.IMAP4_SSL('imap.gmail.com')
+    # imaplib module implements connection based on IMAPv4 protocol
+    mail.login("asfinavayani1@gmail.com", "V@yani1995")
+    # >> ('OK', [username at gmail.com Vineet authenticated (Success)'])
+
+    mail.list() # Lists all labels in GMail
+    mail.select('inbox') # Connected to inbox.
+
+    result, data = mail.uid('search', None, "ALL")
+    # search_content(mail, data, manager)
+
+
+def get_data(manager):
     df = manager.get_emails()
-
-    print(df.head())
-    #
-    # data = []
-    # for emailpath in os.listdir(EMAIL_DATASET_PATH):
-    #     with open(os.path.join(EMAIL_DATASET_PATH, emailpath), 'r') as file:
-    #         line = file.read()
-    #         results_str = line.replace(r'\r', "")
-    #         results_str = results_str.replace(r'\n', " ")
-    #         results_str = results_str.replace(r'b', "")
-    #         results_str = results_str.replace('\\xe2\\x80\\x99', "'")
-    #         results_str = results_str.rstrip()
-    #         results_str = results_str.lstrip()
-    #         data.append(results_str)
-    #
-
-
-    print('Processed All the Email!!')
+    data = []
+    email_ids = []
+    for index, row in df.iterrows():
+        line = row['training_content']
+        line = line.replace(r'\r', "")
+        line = line.replace(r'\n', " ")
+        line = line.replace(r'b', "")
+        line = line.replace('\\xe2\\x80\\x99', "'")
+        line = line.rstrip()
+        line = line.lstrip()
+        data.append(line)
+        email_ids.append(row['email_id'])
+    return data, email_ids

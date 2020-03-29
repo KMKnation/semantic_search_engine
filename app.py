@@ -106,8 +106,4 @@ if __name__ == '__main__':
     if not os.path.exists(app.config['DATABASE_PATH']):
         manager.create_table(db_manager.CREATE_TABLE_STATEMENT)
         print("REQUIRED TABLES CREATED..")
-
-    from ml import email_scrap
-    email_scrap.scrap(manager)
-
-    # app.run(debug=True)
+    app.run(debug=True)
