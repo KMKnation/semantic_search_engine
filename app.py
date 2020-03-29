@@ -70,6 +70,7 @@ def get_invite():
 
         return make_response(json.dumps(result), 200)
     except Exception as err:
+        result["message"] = str(err)
         return make_response(json.dumps(result), 404)
 
 
