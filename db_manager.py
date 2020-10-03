@@ -53,11 +53,14 @@ class DB:
             return rs
 
     def update_email(self, data):
+        print(data)
+        print(count)
         update_query = "UPDATE emails SET " \
                        "cluster = '" + str(data['cluster']) + "'" \
                                                               " WHERE email_id = " + str(data['id']) + ";"
         rs = self.execute_query(update_query)
         return rs
+
 
     def insert_email(self, data):
         inset_query = "INSERT INTO emails " \
