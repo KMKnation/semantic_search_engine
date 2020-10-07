@@ -72,6 +72,9 @@ class DB:
     def get_emails(self, group=None):
         return self.get_data('SELECT * FROM emails WHERE cluster=' + str(group))
 
+    def get_all_emails(self,):
+        return self.get_data('SELECT * FROM emails')
+
 # data = {
 #     'room_token':'213123ccsd',
 #     'contact_info':'mayur@maili.com'

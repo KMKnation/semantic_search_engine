@@ -58,7 +58,9 @@ function sendQuery(query){
 
                 var content = document.createElement('p');
                 content.id = 'card-invite-detail'
-                content.textContent = item.subject;
+                var distance = parseFloat(item.euclidean);
+                distance = distance.toFixed(2);
+                content.textContent = item.subject + " - distance " + distance;
 
                 var toolTip = document.createElement('span');
                 toolTip.id = "tooltiptext";

@@ -64,3 +64,12 @@ for group in set(clusters):
         # if counter > 5:
         #     break
 
+resultDf = manager.get_all_emails()
+for index, row in resultDf.iterrows():
+    # tokenized = clean_text(row['content'])
+    payload = {}
+    payload['id'] = row['email_id']
+    cluster, _ = infer(row['content'], kmeans, vectorizer, lda)
+    payload['cluster'] = cluster[0]
+    manager.update_email(payload)
+    print(payload)
