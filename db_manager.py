@@ -5,7 +5,6 @@ CREATE_TABLE_STATEMENT = 'CREATE TABLE emails(' \
                          'email_id   INT  NOT NULL,' \
                          'subject VARCHAR (100) NOT NULL,' \
                          'content  TEXT  NOT NULL,' \
-                         'training_content  TEXT  NOT NULL,' \
                          'cluster  INT,' \
                          'PRIMARY KEY (email_id));'
 
@@ -64,7 +63,7 @@ class DB:
     def insert_email(self, data):
         inset_query = "INSERT INTO emails " \
                       "VALUES ('" + str(data['email_id']) + "', '" + data['subject'] + "', '" + data[
-                          'content'] + "', '" + data['training_content'] + "', '0');"
+                          'content']  + "', '0');"
         # print(inset_query)
         rs = self.execute_query(inset_query)
         return rs
