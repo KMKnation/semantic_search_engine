@@ -55,7 +55,7 @@ class DB:
         print(data)
         update_query = "UPDATE emails SET " \
                        "cluster = '" + str(data['cluster']) + "'" \
-                                                              " WHERE email_id = " + str(data['id']) + ";"
+                                                              " WHERE email_id = '" + str(data['id']) + "';"
         rs = self.execute_query(update_query)
         return rs
 

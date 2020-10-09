@@ -17,7 +17,7 @@ current_dir = os.curdir
 app = Flask(__name__)
 app.config['DATABASE_PATH'] = os.path.join(os.curdir, 'db/db.sqlite')
 
-
+isReTrained = False
 global kmeans
 global vectorizer
 global lda
@@ -51,6 +51,18 @@ def init():
     if not os.path.exists(app.config['DATABASE_PATH']):
         manager.create_table(db_manager.CREATE_TABLE_STATEMENT)
         print("REQUIRED TABLES CREATED..")
+
+
+    if isReTrained:
+        resultDf = manager.get_all_emails()
+        for index, row in resultDf.iterrows():
+            # tokenized = clean_text(row['content'])
+            payload = {}
+            payload['id'] = row['email_id']
+            cluster, _ = infer(row['subject'], kmeans, vectorizer, lda)
+            payload['cluster'] = cluster[0]
+            manager.update_email(payload)
+            print(payload)
 
 
     print("VECTORIZER LOADED")
@@ -99,7 +111,7 @@ def get_invite():
         for index, row in resultDf.iterrows():
             email_data = dict(row)
 
-            score = distance.euclidean(query_vec, get_vector(row['content'], vectorizer, lda))
+            score = distance.euclidean(query_vec, get_vector(row['subject'], vectorizer, lda))
 
             if score < 0.5:
                 email_data['euclidean'] = score
