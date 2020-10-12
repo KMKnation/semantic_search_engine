@@ -29,6 +29,15 @@ function customChangeEvent(bar) {
         sendQuery(newQuery);
     }
 }
+function makeid(length) {
+    var result = '';
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+}
 
 function sendQuery(query) {
 
@@ -53,10 +62,10 @@ function sendQuery(query) {
                 var cardInvite = document.createElement('div');
                 cardInvite.id = "subject";
                 cardInvite.className = "w3-card-4 test";
-    
+
                 var header = document.createElement('header');
                 header.className = "w3-container w3-blue";
-               
+
 
                 var distance = parseFloat(item.euclidean);
                 distance = distance.toFixed(2);
@@ -77,12 +86,13 @@ function sendQuery(query) {
 
                 var content = document.createElement('div');
                 content.id = "content";
-                content.className = "w3-container"
+                content.className = "w3-container";
                 content.style.display = "None";
+                content.style.wordWrap = "break-word";
                 content.innerHTML = item.content;
 
                 cardInvite.onclick = (event) => {
-                    $("#content").slideToggle("slow");
+                    $(content).slideToggle("slow");
                 };
 
 
