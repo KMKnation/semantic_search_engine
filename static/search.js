@@ -55,11 +55,25 @@ function sendQuery(query) {
                 cardInvite.className = "w3-card-4 test";
     
                 var header = document.createElement('header');
+                header.className = "w3-container w3-blue";
+               
+
                 var distance = parseFloat(item.euclidean);
                 distance = distance.toFixed(2);
-                header.textContent = item.subject + " - distance " + distance;
 
+                var h4elem = document.createElement('h4');
+                h4elem.style.whiteSpace = "nowrap";
+                h4elem.style.overflow = "hidden";
+                h4elem.style.textOverflow = "ellipsis"
+                h4elem.textContent = item.subject + " - distance " + distance;
+                header.appendChild(h4elem);
+
+                var toolTip = document.createElement('span');
+                toolTip.id = "tooltiptext";
+                toolTip.innerHTML = item.subject;
                 cardInvite.appendChild(header);
+
+                cardInvite.appendChild(toolTip);
 
                 var content = document.createElement('div');
                 content.id = "content";
