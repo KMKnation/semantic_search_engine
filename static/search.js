@@ -30,12 +30,12 @@ function customChangeEvent(bar) {
     }
 }
 
-function sendQuery(query){
+function sendQuery(query) {
 
     searchResultElem.style.display = "none";
 
     var data = {
-        "query" : query
+        "query": query
     };
 
     getInvites(function (result) {
@@ -51,28 +51,33 @@ function sendQuery(query){
                 // console.log('contact_info: ' + item.subject);
 
                 var cardInvite = document.createElement('div');
-                cardInvite.id = "card-invite";
-                cardInvite.style.backgroundColor = 'aquamarine'
-
-                cardInvite.style.backgroundColor = '#00aee'
-
-                var content = document.createElement('p');
-                content.id = 'card-invite-detail'
+                cardInvite.id = "subject";
+                cardInvite.className = "w3-card-4 test";
+    
+                var header = document.createElement('header');
                 var distance = parseFloat(item.euclidean);
                 distance = distance.toFixed(2);
-                content.textContent = item.subject + " - distance " + distance;
+                header.textContent = item.subject + " - distance " + distance;
 
-                var toolTip = document.createElement('span');
-                toolTip.id = "tooltiptext";
-                toolTip.innerHTML = item.content;
+                cardInvite.appendChild(header);
 
-                
+                var content = document.createElement('div');
+                content.id = "content";
+                content.className = "w3-container"
+                content.style.display = "None";
+                content.innerHTML = item.content;
+
+                cardInvite.onclick = (event) => {
+                    $("#content").slideToggle("slow");
+                };
+
+
                 // cardInvite.onclick = function () {
                 //     // window.location.href = API_SERVER + "/invite/" + item.id;
                 // };
 
                 cardInvite.appendChild(content);
-                cardInvite.appendChild(toolTip);
+                // cardInvite.appendChild(toolTip);
                 container.appendChild(cardInvite);
             });
         } else {
