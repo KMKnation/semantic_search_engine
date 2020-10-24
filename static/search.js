@@ -29,6 +29,12 @@ function customChangeEvent(bar) {
         sendQuery(newQuery);
     }
 }
+
+function b64DecodeUnicode(str) {
+    return window.atob(str);
+}
+
+
 function makeid(length) {
     var result = '';
     var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -89,7 +95,15 @@ function sendQuery(query) {
                 content.className = "w3-container";
                 content.style.display = "None";
                 content.style.wordWrap = "break-word";
-                content.innerHTML = item.content;
+
+                try {
+                    var htmlContent = b64DecodeUnicode(item.content);
+                    content.innerHTML = htmlContent;
+                } catch (e) {
+                    console.log(e)
+                    content.innerHTML = item.content;
+
+                }
 
                 cardInvite.onclick = (event) => {
                     $(content).slideToggle("slow");
