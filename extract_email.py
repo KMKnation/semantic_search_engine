@@ -40,7 +40,6 @@ def getLabels(service, userId='me'):
         for label in labels:
             print(label['name'])
     return
-
 def getMessages(manager, service, userId='me', pageToken=None):
     result = service.users().messages().list(userId=userId, pageToken=pageToken, maxResults=50).execute()
     messages, nextPageToken, resultSizeEstimate = result['messages'], result['nextPageToken'], result[

@@ -83,3 +83,4 @@ class DB:
 # DB().create_table(CREATE_TABLE_STATEMENT)
 # insert_invite(engine,data)
 # print(DB().get_invitations())
+
