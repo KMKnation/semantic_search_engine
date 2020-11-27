@@ -11,6 +11,7 @@ import re
 import string
 import nltk
 from scipy.spatial import distance
+import base64
 
 current_dir = os.curdir
 # create the application object
@@ -23,6 +24,9 @@ global vectorizer
 global lda
 stopword = nltk.corpus.stopwords.words('english')
 
+def decode(text):
+    text = base64.urlsafe_b64decode(text).decode('utf-8')
+    return text
 
 def clean_text(text):
     text = text.replace('[image: Google]', '')
