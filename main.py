@@ -12,6 +12,7 @@ import re
 import base64
 import string
 import nltk
+from bs4 import BeautifulSoup
 
 current_dir = os.curdir
 
@@ -44,13 +45,12 @@ def infer(text, kmeans, vectorizer):
 
 
 def clean_text(text):
-    text = text.replace('[image: Google]', '')
+    text = BeautifulSoup(str(text), "lxml").text
     text_nopunct = "".join([char for char in text if char not in string.punctuation])
     tokens = re.split('\W+', text_nopunct)
     tokens = [word.lower() for word in tokens]
     text = [word for word in tokens if word not in stopword]
     text = [word for word in text if len(word) > 1]
-
     return text
 
 kmeans = pickle.load(open("kmeans.pkl", "rb"))
@@ -117,5 +117,5 @@ if __name__ == '__main__':
 
     data = main(args)
     for i in range(args.number):
-        print(data[i]['subject'])
+        print("{} - {} - {}".format(i, str(data[i]['subject']), str(data[i]['euclidean'])))
         print('============')
