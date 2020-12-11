@@ -11,19 +11,16 @@ import db_manager
 from db_manager import DB
 
 
-def decode_base64(data, altchars=b'+/'):
-    """Decode base64, padding being optional.
+def decode(text):
+    text = base64.urlsafe_b64decode(text).decode('utf-8')
+    return text
 
-    :param data: Base64 data as an ASCII byte string
-    :returns: The decoded byte string.
+def encode(text):
+    text = base64.urlsafe_b64encode(text.encode('utf-8'))
+    return text.decode('utf-8')
 
-    """
-    data = re.sub(rb'[^a-zA-Z0-9%s]+' % altchars, b'', data)  # normalize
-    missing_padding = len(data) % 4
-    if missing_padding:
-        data += b'=' * (4 - missing_padding)
-    return base64.b64decode(data, altchars)
 
+counter = 1
 
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
@@ -40,20 +37,74 @@ def getLabels(service, userId='me'):
         for label in labels:
             print(label['name'])
     return
+
+def getThreads(manager, service, userId='me', pageToken=None):
+    global counter
+    result = service.users().threads().list(userId=userId).execute()
+
+    if 'nextPageToken' in result:
+        threads, nextPageToken, resultSizeEstimate = result['threads'], result['nextPageToken'], result[
+            'resultSizeEstimate']
+    else:
+        threads = result['threads']
+        nextPageToken = None
+
+    for output in threads:
+        tdata = service.users().messages().get(userId=userId, id=output['id']).execute()
+
+        try:
+            if tdata['payload']['body']['size'] > 0:
+                data = tdata['payload']['body']['data']
+                # content = data.encode('utf-8')
+                print(tdata['snippet'])
+                payload = {
+                    'email_id': counter,
+                    'subject': tdata['snippet'],
+                    'content': data
+
+                }
+                manager.insert_email(payload)
+                print('INSERT SUCCESS !! {}'.format(counter))
+            else:
+                print(tdata['snippet'])
+                payload = {
+                    'email_id': counter,
+                    'subject': tdata['snippet'],
+                    'content': encode(tdata['snippet'])
+                }
+                manager.insert_email(payload)
+                print('INSERT SUCCESS !! {}'.format(counter))
+
+
+            counter = counter + 1
+        except Exception as err:
+            print(err)
+
+    if nextPageToken != None:
+        getThreads(manager, service, userId, nextPageToken)
+        print('Querying next page = {}'.format(nextPageToken))
+
+    return
+
+
 def getMessages(manager, service, userId='me', pageToken=None):
     result = service.users().messages().list(userId=userId, pageToken=pageToken, maxResults=50).execute()
-    messages, nextPageToken, resultSizeEstimate = result['messages'], result['nextPageToken'], result[
-        'resultSizeEstimate']
+    if 'nextPageToken' in result:
+        messages, nextPageToken, resultSizeEstimate = result['messages'], result['nextPageToken'], result[
+            'resultSizeEstimate']
+    else:
+        messages = result['messages']
+        nextPageToken = None
+
     for output in messages:
         tdata = service.users().messages().get(userId=userId, id=output['id']).execute()
 
         try:
             if tdata['payload']['body']['size'] > 0:
                 data = tdata['payload']['body']['data']
-                content = data.encode('utf-8')
-                content = decode_base64(content)
+                # content = data.encode('utf-8')
+                content = decode(data)
                 print(tdata['snippet'])
-                print(type(content))
                 payload = {
                     'email_id': output['id'],
                     'subject': tdata['snippet'],
@@ -62,10 +113,20 @@ def getMessages(manager, service, userId='me', pageToken=None):
                 }
                 manager.insert_email(payload)
                 print('INSERT SUCCESS !!')
+            else:
+                print(tdata['snippet'])
+                payload = {
+                    'email_id': output['id'],
+                    'subject': tdata['snippet'],
+                    'content': encode(tdata['snippet'])
+                }
+                manager.insert_email(payload)
+                print('INSERT SUCCESS !! {}'.format(counter))
+
         except Exception as err:
             print(err)
 
-    if nextPageToken != None or len(nextPageToken) != 0:
+    if nextPageToken != None :
         getMessages(manager, service, userId, nextPageToken)
         print('Querying next page = {}'.format(nextPageToken))
 
