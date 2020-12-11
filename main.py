@@ -8,6 +8,7 @@ import json
 from db_manager import DB
 import config
 import pickle
+from pprint import pprint
 import re
 import base64
 import string
@@ -16,12 +17,10 @@ from bs4 import BeautifulSoup
 
 current_dir = os.curdir
 
-
 # create the application object
 app = Flask(__name__)
 app.config['DATABASE_PATH'] = os.path.join(os.curdir, 'db/db.sqlite')
 
-isReTrained = False
 global kmeans
 global vectorizer
 stopword = nltk.corpus.stopwords.words('english')
@@ -30,6 +29,7 @@ stopword = nltk.corpus.stopwords.words('english')
 def decode(text):
     text = base64.urlsafe_b64decode(text).decode('utf-8')
     return text
+
 
 def get_vector(text, vectorizer):
     custom_data = [text]
@@ -53,6 +53,7 @@ def clean_text(text):
     text = [word for word in text if len(word) > 1]
     return text
 
+
 kmeans = pickle.load(open("kmeans.pkl", "rb"))
 vectorizer = pickle.load(open('tfidf.pickle', "rb"))
 
@@ -66,8 +67,8 @@ if not os.path.exists(app.config['DATABASE_PATH']):
     manager.create_table(db_manager.CREATE_TABLE_STATEMENT)
     print("REQUIRED TABLES CREATED..")
 
-a = 1
-if a == 0:
+isRetrain = False
+if isRetrain:
     resultDf = manager.get_all_emails()
     for index, row in resultDf.iterrows():
         # tokenized = clean_text(row['content'])
@@ -99,6 +100,7 @@ def main(args):
     for index, row in resultDf.iterrows():
         email_data = dict(row)
         body = decode(row['content'])
+        email_data['content'] = BeautifulSoup(body, "lxml").text
         score = distance.euclidean(query_vec.toarray(), get_vector(body, vectorizer).toarray())
 
         if score > 0:
@@ -117,5 +119,14 @@ if __name__ == '__main__':
 
     data = main(args)
     for i in range(args.number):
-        print("{} - {} - {}".format(i, str(data[i]['subject']), str(data[i]['euclidean'])))
-        print('============')
+        # pprint("{} - {} - {}".format(i, str(data[i]['subject']), str(data[i]['euclidean'])), compact=True)
+        # pprint('\n')
+        # pprint("     {}".format(data[i]['content']).replace("\n", ""), compact=True, depth=3)
+        pprint({
+            "index": i,
+            "euclidean": str(data[i]['euclidean']),
+            "subject": str(data[i]['subject'])
+            # "content": data[i]['content'].replace("\n", "").replace("  ", "").replace("\r", "")
+
+        })
+        pprint('============')
