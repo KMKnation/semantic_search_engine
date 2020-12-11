@@ -18,7 +18,7 @@ current_dir = os.curdir
 app = Flask(__name__)
 app.config['DATABASE_PATH'] = os.path.join(os.curdir, 'db/db.sqlite')
 
-isReTrained = False
+isReTrained = True
 global kmeans
 global vectorizer
 global lda
